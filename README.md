@@ -1,6 +1,6 @@
 # Dummy Hotel Booking app for Kognitiv Corp.
 
-### ![This app is live here]('https://rg-kognitiv.netlify.app/')
+<a href="https://rg-kognitiv.netlify.app/"> <h3> This app is live here </h3> </a>
 
 ---
 
