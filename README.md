@@ -1,6 +1,6 @@
 # Dummy Hotel Booking app for Kognitiv Corp.
 
-### This webapp is hosted live at :
+### ![This app is live here]('https://rg-kognitiv.netlify.app/')
 
 ---
 
