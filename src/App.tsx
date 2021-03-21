@@ -1,4 +1,6 @@
 import React, { Fragment } from "react";
+import { Provider } from "react-redux";
+import store from "./redux/store";
 import {
   BrowserRouter as Router,
   Switch,
@@ -9,22 +11,24 @@ import { Nav, Booking, About, Contact, Error } from "./components";
 
 const App = () => {
   return (
-    <Fragment>
-      <Router>
-        <div>
-          <Nav />
-        </div>
-        <div>
-          <Switch>
-            <Route path="/" exact component={Booking} />
-            <Route path="/about" exact component={About} />
-            <Route path="/contact" exact component={Contact} />
-            <Route path="/error" exact component={Error} />
-            <Redirect to="/error" />
-          </Switch>
-        </div>
-      </Router>
-    </Fragment>
+    <Provider store={store}>
+      <Fragment>
+        <Router>
+          <div>
+            <Nav />
+          </div>
+          <div>
+            <Switch>
+              <Route path="/" exact component={Booking} />
+              <Route path="/about" exact component={About} />
+              <Route path="/contact" exact component={Contact} />
+              <Route path="/error" exact component={Error} />
+              <Redirect to="/error" />
+            </Switch>
+          </div>
+        </Router>
+      </Fragment>
+    </Provider>
   );
 };
 

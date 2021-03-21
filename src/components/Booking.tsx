@@ -1,63 +1,70 @@
-import React, { Fragment, useEffect, useState, useRef } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import { Row, Col, Input, Select, Form, Button } from "antd";
 import { HomeOutlined, AimOutlined } from "@ant-design/icons";
+import { useSelector, useDispatch } from "react-redux";
+import { setName, setLocation, setDistance, setBrand } from "../redux/actions";
 import styled from "styled-components";
-import { ResponseType } from "../service";
+import { ResponseType, HotelStructureType, HotelAppType } from "../service";
 const { Option } = Select;
-
-const distanceSample = {
+const distanceSample: ResponseType = {
   status: true,
   data: ["0km", "10km", "20km"],
 };
-const brandSample = {
+const brandSample: ResponseType = {
   status: true,
   data: ["Amazon", "Flipkart", "PayTM"],
 };
 const Booking = () => {
-  const [brands, setBrands] = useState<ResponseType>(brandSample);
-  const [distances, setDistances] = useState<ResponseType>(distanceSample);
+  const dispatch = useDispatch();
+  const hotelName: string = String(
+    useSelector<HotelStructureType>((state) => state.name)
+  );
+  const locationName: string = String(
+    useSelector<HotelStructureType>((state) => state.location)
+  );
+  const distanceName: number = Number(
+    useSelector<HotelStructureType>((state) => state.distance)
+  );
+  const brandName: number = Number(
+    useSelector<HotelStructureType>((state) => state.brand)
+  );
+
+  const [brands, setBrands] = useState<ResponseType>();
+  const [distances, setDistances] = useState<ResponseType>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [hotelName, setHotelName] = useState<string>();
-  const [hotelLocation, setHotelLocation] = useState<string>();
-  const [selectedDistance, setSelectedDistance] = useState<number>();
-  const [selectedBrand, setSelectedBrand] = useState<number>();
 
   const fetchData = async () => {
     await fetch("https://distance.free.beeceptor.com/")
-      .then((response) => response.json())
+      .then((response) => {
+        return response.status === 200 ? response.json() : distanceSample;
+      })
       .then((data) => {
         setDistances(data);
       });
     await fetch("https://brands.free.beeceptor.com/")
-      .then((response) => response.json())
+      .then((response) => {
+        return response.status === 200 ? response.json() : brandSample;
+      })
       .then((data) => {
         setBrands(data);
       });
   };
   useEffect(() => {
     setIsLoading(true);
-    //fetchData();
-    setHotelName(String(localStorage.getItem("hotel_name") || ""));
-    setHotelLocation(String(localStorage.getItem("hotel_location") || ""));
-    setSelectedBrand(Number(localStorage.getItem("hotel_brand") || 0));
-    setSelectedDistance(Number(localStorage.getItem("hotel_distance") || 0));
+    fetchData();
     setIsLoading(false);
   }, []);
   const onNameChange = (e: string) => {
-    setHotelName(e);
-    String(localStorage.setItem("hotel_name", e));
+    dispatch(setName(e));
   };
   const onLocationChange = (e: string) => {
-    setHotelLocation(e);
-    String(localStorage.setItem("hotel_location", e));
+    dispatch(setLocation(e));
   };
   const onDistanceChange = (e: number) => {
-    setSelectedDistance(e);
-    localStorage.setItem("hotel_distance", e.toString());
+    dispatch(setDistance(e));
   };
   const onBrandChange = (e: number) => {
-    setSelectedBrand(e);
-    localStorage.setItem("hotel_brand", e.toString());
+    dispatch(setBrand(e));
   };
   return (
     <Fragment>
@@ -93,7 +100,7 @@ const Booking = () => {
                 <Input
                   size={"large"}
                   placeholder={"Enter Hotel location..."}
-                  value={hotelLocation}
+                  value={locationName}
                   prefix={<AimOutlined />}
                   onChange={(e) => onLocationChange(e.target.value)}
                 />
@@ -106,9 +113,9 @@ const Booking = () => {
                 rules={[{ required: true, message: "Select distance..." }]}
               >
                 <Select
-                  style={{ width: 200 }}
-                  value={selectedDistance}
-                  //defaultValue={selectedDistance}
+                  style={{ width: 400 }}
+                  placeholder={"Select Distance..."}
+                  value={distanceName >= 0 ? distanceName : undefined}
                   onChange={(e) => onDistanceChange(e)}
                 >
                   {distances?.data.map((distance, id) => {
@@ -123,13 +130,12 @@ const Booking = () => {
               <Form.Item
                 label={"Choose Brand"}
                 initialValue={"Brands..."}
-                //name={"brand"}
                 rules={[{ required: true, message: "Select Brand..." }]}
               >
                 <Select
-                  style={{ width: 200 }}
-                  value={selectedBrand}
-                  //defaultValue={selectedBrand}
+                  style={{ width: 400 }}
+                  placeholder={"Select Brands..."}
+                  value={brandName >= 0 ? brandName : undefined}
                   onChange={(e) => onBrandChange(e)}
                 >
                   {brands?.data.map((brand, id) => {
