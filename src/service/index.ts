@@ -9,6 +9,14 @@ export interface HotelStructureType {
   distance: number;
   brand: number;
 }
+export const distanceSample: ResponseType = {
+  status: true,
+  data: ["0km", "10km", "20km"],
+};
+export const brandSample: ResponseType = {
+  status: true,
+  data: ["Amazon", "Flipkart", "Paytm"],
+};
 export const getName = () => {
   return String(localStorage.getItem("hotel_name") || "");
 };
@@ -39,27 +47,10 @@ export const setBrand = (b: number) => {
   return b;
 };
 
-export const getDistances = async () => {
-  let res;
-  fetch("https://distance.free.beeceptor.com/")
-    .then((response) => {
-      return response.json();
-    })
-    .then((data) => {
-      //console.log(data);
-      res = data;
-    });
-  return res;
-};
-export const getBrands = () => {
-  let res;
-  fetch("https://brands.free.beeceptor.com/")
-    .then((response) => {
-      return response.json();
-    })
-    .then((data) => {
-      console.log(data);
-      res = data;
-    });
-  return res;
+export const onSubmit = (status: object) => {
+  localStorage.removeItem("hotel_name");
+  localStorage.removeItem("hotel_location");
+  localStorage.removeItem("hotel_distance");
+  localStorage.removeItem("hotel_brand");
+  localStorage.setItem("bookingData", JSON.stringify(status));
 };

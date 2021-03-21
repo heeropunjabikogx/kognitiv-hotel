@@ -1,19 +1,36 @@
 import React, { Fragment, useEffect, useState } from "react";
-import { Row, Col, Input, Select, Form, Button } from "antd";
+import { Row, Col, Input, Select, Form, Button, Modal } from "antd";
 import { HomeOutlined, AimOutlined } from "@ant-design/icons";
 import { useSelector, useDispatch } from "react-redux";
-import { setName, setLocation, setDistance, setBrand } from "../redux/actions";
+import {
+  setName,
+  setLocation,
+  setDistance,
+  setBrand,
+  submit,
+} from "../redux/actions";
 import styled from "styled-components";
-import { ResponseType, HotelStructureType, HotelAppType } from "../service";
+import {
+  ResponseType,
+  HotelStructureType,
+  distanceSample,
+  brandSample,
+} from "../service";
 const { Option } = Select;
-const distanceSample: ResponseType = {
-  status: true,
-  data: ["0km", "10km", "20km"],
-};
-const brandSample: ResponseType = {
-  status: true,
-  data: ["Amazon", "Flipkart", "PayTM"],
-};
+
+const HeaderContainer = styled.div`
+  img {
+    width: 100%;
+    height: 40vh;
+    object-fit: cover;
+  }
+`;
+const ButtonContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 5rem;
+`;
 const Booking = () => {
   const dispatch = useDispatch();
   const hotelName: string = String(
@@ -22,7 +39,7 @@ const Booking = () => {
   const locationName: string = String(
     useSelector<HotelStructureType>((state) => state.location)
   );
-  const distanceName: number = Number(
+  const totalDistance: number = Number(
     useSelector<HotelStructureType>((state) => state.distance)
   );
   const brandName: number = Number(
@@ -66,6 +83,29 @@ const Booking = () => {
   const onBrandChange = (e: number) => {
     dispatch(setBrand(e));
   };
+
+  const bookingSuccess = () => {
+    Modal.info({
+      title: "Your booking has been confirmed...",
+      content: (
+        <div>
+          <p>
+            {" "}
+            {"Hotel Name: "} {hotelName}{" "}
+          </p>
+          <p>
+            {" "}
+            {"Location: "} {locationName}
+          </p>
+        </div>
+      ),
+      okText: "Thank You",
+      onOk() {
+        window.location.reload();
+      },
+    });
+  };
+
   return (
     <Fragment>
       {isLoading ? (
@@ -73,49 +113,82 @@ const Booking = () => {
       ) : (
         <Form
           name={"kognitiv"}
-          onFinish={() => {
-            console.log("Finish");
+          onFinish={(e) => {
+            dispatch(
+              submit({ hotelName, locationName, brandName, totalDistance })
+            );
+            bookingSuccess();
           }}
         >
           <Row>
-            <Col span={16} offset={4}>
+            <Col span={24}>
+              <HeaderContainer>
+                <img
+                  alt="HotelBooking App"
+                  src={
+                    "https://i.pinimg.com/originals/cd/11/e9/cd11e9cc2d09b20cc0a7e263b5535a5e.jpg"
+                  }
+                />
+              </HeaderContainer>
+            </Col>
+          </Row>
+          <Row>
+            <Col span={24}>
+              <h1
+                style={{ textAlign: "center" }}
+                className={"text-primary mt-5 mb-5"}
+              >
+                {"Hotel Booking App"}{" "}
+              </h1>
+            </Col>
+          </Row>
+          <Row>
+            <Col span={20} offset={4}>
+              <h5 className={"mt-5"}> {"Hotel and City of Choice"} </h5>
+            </Col>
+            <Col span={8} offset={4}>
               <Form.Item
-                label={"Enter Name"}
+                label={"Name"}
                 rules={[{ required: true, message: "Please enter Name!" }]}
               >
                 <Input
-                  size={"large"}
                   placeholder={"Enter Hotel name..."}
                   value={hotelName}
                   prefix={<HomeOutlined />}
                   onChange={(e) => onNameChange(e.target.value)}
+                  required={true}
                 />
               </Form.Item>
+            </Col>
+            <Col span={8} offset={1}>
               <Form.Item
-                label={"Enter Location"}
+                label={"City"}
                 rules={[
                   { required: true, message: "Please enter Location..." },
                 ]}
               >
                 <Input
-                  size={"large"}
                   placeholder={"Enter Hotel location..."}
                   value={locationName}
                   prefix={<AimOutlined />}
                   onChange={(e) => onLocationChange(e.target.value)}
+                  required={true}
                 />
               </Form.Item>
-
+            </Col>
+          </Row>
+          <Row>
+            <Col span={20} offset={4}>
+              <h5 className={"mt-5"}> {"Filters"} </h5>
+            </Col>
+            <Col span={8} offset={4}>
               <Form.Item
-                label={"Choose Distance"}
-                initialValue="Distance..."
-                //name={"distance"}
+                label={"Distance"}
                 rules={[{ required: true, message: "Select distance..." }]}
               >
                 <Select
-                  style={{ width: 400 }}
                   placeholder={"Select Distance..."}
-                  value={distanceName >= 0 ? distanceName : undefined}
+                  value={totalDistance >= 0 ? totalDistance : undefined}
                   onChange={(e) => onDistanceChange(e)}
                 >
                   {distances?.data.map((distance, id) => {
@@ -127,13 +200,13 @@ const Booking = () => {
                   })}
                 </Select>
               </Form.Item>
+            </Col>
+            <Col span={8} offset={1}>
               <Form.Item
-                label={"Choose Brand"}
-                initialValue={"Brands..."}
+                label={"Brand"}
                 rules={[{ required: true, message: "Select Brand..." }]}
               >
                 <Select
-                  style={{ width: 400 }}
                   placeholder={"Select Brands..."}
                   value={brandName >= 0 ? brandName : undefined}
                   onChange={(e) => onBrandChange(e)}
@@ -147,11 +220,22 @@ const Booking = () => {
                   })}
                 </Select>
               </Form.Item>
-              <Form.Item>
-                <Button type={"primary"} htmlType={"submit"}>
-                  {"Submit"}
-                </Button>
-              </Form.Item>
+            </Col>
+          </Row>
+          <Row>
+            <Col span={24}>
+              <ButtonContainer>
+                <Form.Item>
+                  <Button
+                    style={{ margin: "auto" }}
+                    type={"primary"}
+                    htmlType={"submit"}
+                    size={"large"}
+                  >
+                    {"Submit"}
+                  </Button>
+                </Form.Item>
+              </ButtonContainer>
             </Col>
           </Row>
         </Form>

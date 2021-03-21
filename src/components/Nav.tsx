@@ -8,7 +8,6 @@ const StyledLink = styled(Link)`
 `;
 const Navigation = styled.nav`
   background-color: #101820;
-  margin-bottom: 2rem;
   -webkit-box-shadow: 0 8px 6px -6px #999;
   -moz-box-shadow: 0 8px 6px -6px #999;
   box-shadow: 0 8px 6px -6px #999;

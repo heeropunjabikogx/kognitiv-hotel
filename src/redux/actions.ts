@@ -1,4 +1,10 @@
-import { SET_BRAND, SET_DISTANCE, SET_LOCATION, SET_NAME } from "./types";
+import {
+  SET_BRAND,
+  SET_DISTANCE,
+  SET_LOCATION,
+  SET_NAME,
+  SUBMIT,
+} from "./types";
 
 export const setBrand = (name: number) => {
   return {
@@ -22,5 +28,11 @@ export const setName = (name: string) => {
   return {
     type: SET_NAME,
     payload: name,
+  };
+};
+export const submit = (status: object) => {
+  return {
+    type: SUBMIT,
+    payload: status,
   };
 };
